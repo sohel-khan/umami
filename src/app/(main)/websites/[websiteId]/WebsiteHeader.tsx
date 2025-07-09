@@ -58,6 +58,11 @@ export function WebsiteHeader({
     },
   ];
 
+  const isFromShareLink = pathname.includes('/share/');
+  const routeDir = isFromShareLink ? 'share' : 'websites';
+
+  const routeId = isFromShareLink ? website.shareId : websiteId;
+
   return (
     <div className={styles.header}>
       <div className={styles.title}>
@@ -66,17 +71,26 @@ export function WebsiteHeader({
         <ActiveUsers websiteId={websiteId} />
       </div>
       <div className={styles.actions}>
-        {showLinks && (
+        {(true || showLinks) && (
           <div className={styles.links}>
             {links.map(({ label, icon, path }) => {
+              if (isFromShareLink && path == '/reports') {
+                return;
+              }
               const selected = path
                 ? pathname.includes(path)
+                : isFromShareLink
+                ? pathname.match(/^\/share\/[\w-]+$/)
                 : pathname.match(/^\/websites\/[\w-]+$/);
 
               return (
                 <Link
                   key={label}
-                  href={renderTeamUrl(`/websites/${websiteId}${path}`)}
+                  href={renderTeamUrl(
+                    isFromShareLink
+                      ? `/${routeDir}/${routeId}/${website?.domain}/${path}`
+                      : `/${routeDir}/${routeId}${path}`,
+                  )}
                   shallow={true}
                 >
                   <Button
