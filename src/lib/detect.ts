@@ -89,13 +89,14 @@ function decodeHeader(s: string | undefined | null): string | undefined | null {
 export async function getLocation(ip: string = '', headers: Headers, hasPayloadIP: boolean) {
   console.log("----------------------------------------")
   console.log('getLocation ip ::', ip);
+  console.log('getLocation headers ::', headers);
+
   // Ignore local ips
   if (await isLocalhost(ip)) {
     return;
   }
 
 
-  console.log('getLocation headers ::', headers);
   console.log('getLocation hasPayloadIP', hasPayloadIP);
 
   if (!hasPayloadIP && !process.env.SKIP_LOCATION_HEADERS) {
