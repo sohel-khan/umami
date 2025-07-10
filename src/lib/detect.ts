@@ -168,6 +168,7 @@ export async function getClientInfo(request: Request, payload: Record<string, an
   const userAgent = payload?.userAgent || request.headers.get('user-agent');
   const ip = payload?.ip || getIpAddress(request.headers);
   const location = await getLocation(ip, request.headers, !!payload?.ip);
+  console.log("location -----::", location)
   const country = location?.country;
   const region = location?.region;
   const city = location?.city;
