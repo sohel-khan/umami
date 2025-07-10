@@ -87,25 +87,14 @@ function decodeHeader(s: string | undefined | null): string | undefined | null {
 }
 
 export async function getLocation(ip: string = '', headers: Headers, hasPayloadIP: boolean) {
-  console.log("----------------------------------------")
-  console.log('getLocation ip ::', ip);
-  console.log('getLocation headers ::', headers);
-
   // Ignore local ips
   if (await isLocalhost(ip)) {
     return;
   }
 
-
-  console.log('getLocation hasPayloadIP', hasPayloadIP);
-
   if (!hasPayloadIP && !process.env.SKIP_LOCATION_HEADERS) {
     // Cloudflare headers
-    console.log("LINE NO: 103")
-
     if (headers.get('cf-ipcountry')) {
-      console.log("LINE NO: 106")
-
       const country = decodeHeader(headers.get('cf-ipcountry'));
       const region = decodeHeader(headers.get('cf-region-code'));
       const city = decodeHeader(headers.get('cf-ipcity'));
@@ -119,8 +108,6 @@ export async function getLocation(ip: string = '', headers: Headers, hasPayloadI
 
     // Vercel headers
     if (headers.get('x-vercel-ip-country')) {
-      console.log("LINE NO: 121")
-
       const country = decodeHeader(headers.get('x-vercel-ip-country'));
       const region = decodeHeader(headers.get('x-vercel-ip-country-region'));
       const city = decodeHeader(headers.get('x-vercel-ip-city'));
@@ -133,25 +120,18 @@ export async function getLocation(ip: string = '', headers: Headers, hasPayloadI
     }
   }
 
-      console.log("LINE NO: 135")
-
   // Database lookup
   if (!global[MAXMIND]) {
-      console.log("LINE NO: 137")
-
     const dir = path.join(process.cwd(), 'geo');
-      console.log("dir ::", dir)
 
     global[MAXMIND] = await maxmind.open(path.resolve(dir, 'GeoLite2-City.mmdb'));
   }
 
   // When the client IP is extracted from headers, sometimes the value includes a port
   const cleanIp = ip?.split(':')[0];
-  const result = global[MAXMIND].get(cleanIp);
+  const result = global[MAXMIND].get(cleanIp);  
 
   if (result) {
-      console.log("LINE NO: 150")
-
     const country = result.country?.iso_code ?? result?.registered_country?.iso_code;
     const region = result.subdivisions?.[0]?.iso_code;
     const city = result.city?.names?.en;
@@ -168,7 +148,6 @@ export async function getClientInfo(request: Request, payload: Record<string, an
   const userAgent = payload?.userAgent || request.headers.get('user-agent');
   const ip = payload?.ip || getIpAddress(request.headers);
   const location = await getLocation(ip, request.headers, !!payload?.ip);
-  console.log("location -----::", location)
   const country = location?.country;
   const region = location?.region;
   const city = location?.city;
