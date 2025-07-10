@@ -4,11 +4,15 @@ import Empty from '@/components/common/Empty';
 import Avatar from '@/components/common/Avatar';
 import Link from 'next/link';
 import Icons from '@/components/icons';
+import { usePathname } from 'next/navigation';
 
 export function EventsTable({ data = [] }) {
   const { formatTimezoneDate } = useTimezone();
   const { formatMessage, labels } = useMessages();
   const { renderTeamUrl } = useTeamUrl();
+  const pathname = usePathname();
+
+  const isSharePage = pathname.includes('/share/');
 
   if (data.length === 0) {
     return <Empty />;
@@ -18,7 +22,13 @@ export function EventsTable({ data = [] }) {
     <GridTable data={data}>
       <GridColumn name="session" label={formatMessage(labels.session)} width={'100px'}>
         {row => (
-          <Link href={renderTeamUrl(`/websites/${row.websiteId}/sessions/${row.sessionId}`)}>
+          <Link
+            href={
+              isSharePage
+                ? `sessions/${row.sessionId}`
+                : renderTeamUrl(`/websites/${row.websiteId}/sessions/${row.sessionId}`)
+            }
+          >
             <Avatar seed={row.sessionId} size={64} />
           </Link>
         )}
